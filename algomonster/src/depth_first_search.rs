@@ -74,6 +74,24 @@ fn build_tree<'a, T>(nodes: &mut Iter<&str>) -> Option<Box<Node<T>>> where T: Fr
 }
 
 #[allow(dead_code)]
+fn pre_order_traversal_recursive<T>(node: &Node<T>, output: &mut Vec<T>) -> () where T: Copy {
+    output.push(node.val);
+    if let Some(node_box) = &node.left {
+        pre_order_traversal_recursive(node_box.deref(), output)
+    }
+    if let Some(node_box) = &node.right {
+        pre_order_traversal_recursive(node_box.deref(), output)
+    }
+}
+
+#[allow(dead_code)]
+fn pre_order_traversal<T>(node: &Node<T>) -> Vec<T> where T: Copy {
+    let mut output: Vec<T> = Vec::new();
+    pre_order_traversal_recursive(node, &mut output);
+    output
+}
+
+#[allow(dead_code)]
 fn in_order_traversal_recursive<T>(node: &Node<T>, output: &mut Vec<T>) -> () where T: Copy {
     if let Some(node_box) = &node.left {
         in_order_traversal_recursive(node_box.deref(), output)
@@ -143,6 +161,20 @@ mod tests {
 
         let result: Option<Box<Node<i32>>> = build_tree_from_str(input);
         assert_eq!(result, Some(Box::new(expected_tree)));
+    }
+
+    #[test]
+    fn pre_order_traversal_non_empty_tree() {
+        let tree = build_tree_from_str("1 2 4 x x 5 x x 3 6 x x 7 x x");
+//        ┌─── 1 ───┐
+//        ▼         ▼
+//     ┌─ 2 ─┐   ┌─ 3 ─┐
+//     ▼     ▼   ▼     ▼
+//     4     5   6     7
+
+        let result: Vec<i32> = pre_order_traversal(&tree.unwrap());
+
+        assert_eq!(result, vec![1, 2, 4, 5, 3, 6, 7])
     }
 
     #[test]
