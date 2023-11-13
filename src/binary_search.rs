@@ -83,6 +83,25 @@ fn binary_search_first_occurrence<T: Ord>(input: &Vec<T>, target: T) -> Option<u
     return if found { Some(first_matched_index) } else { None };
 }
 
+#[allow(dead_code)]
+fn binary_search_square_root_estimation(n: i32) -> i32 {
+    let mut left = 0;
+    let mut right = n;
+    let mut res = 0;
+    while left <= right {
+        let mid = (left + right).wrapping_div(2);
+        if (mid * mid) == n {
+            return mid;
+        } else if (mid * mid) > n {
+            res = right;
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return res - 1;
+}
+
 #[test]
 fn vanilla_binary_search_should_find() {
     let given_vector = vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -109,6 +128,7 @@ fn find_boundary_binary_search_should_find() {
     assert_eq!(result.unwrap(), 3);
 }
 
+
 #[test]
 fn find_boundary_binary_search_given_only_false_should_not_find() {
     let given_input = vec![false, false, false, false, false];
@@ -116,7 +136,6 @@ fn find_boundary_binary_search_given_only_false_should_not_find() {
 
     assert!(result.is_none());
 }
-
 
 #[test]
 fn binary_search_first_matching_should_find() {
@@ -156,4 +175,14 @@ fn binary_search_first_occurrence_should_not_find() {
     let result = binary_search_first_occurrence(&given_input, 6);
 
     assert!(result.is_none())
+}
+
+#[test]
+fn binary_search_square_root_estimation_is_exactly_integer() {
+    assert_eq!(binary_search_square_root_estimation(9), 3);
+}
+
+#[test]
+fn binary_search_square_root_estimation_is_not_integer() {
+    assert_eq!(binary_search_square_root_estimation(8), 2);
 }
