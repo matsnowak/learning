@@ -15,6 +15,7 @@
 //! **Balanced Binary Tree** - the height difference of the left and right subtree of the node is not more than 1 
 //!
 use std::cmp::max;
+use std::fmt::Display;
 use std::ops::Deref;
 use std::slice::Iter;
 use std::str::FromStr;
@@ -151,6 +152,37 @@ fn tree_max_depth<T>(node: Node<T>) -> usize {
     // max(left_depth, right_depth)
 }
 
+#[allow(dead_code)]
+fn serialize<T>(node: Option<Box<Node<T>>>) -> String where T: Copy + Display {
+    let mut results: Vec<String> = Vec::new();
+    fn dfs<T>(node: Option<Box<Node<T>>>, results: &mut Vec<String>) -> () where T: Copy + Display {
+        results.push(
+            node.as_ref().map(
+                |node| node.val.to_string()).unwrap_or("x".to_string())
+        );
+        if let Some(some_node) = node {
+            dfs(some_node.left, results);
+            dfs(some_node.right, results);
+        }
+    }
+    dfs(node, &mut results);
+    results.join(" ")
+}
+
+#[allow(dead_code)]
+fn invert_binary_tree<T>(node: &Option<Box<Node<T>>>) -> Option<Box<Node<T>>> where T: Copy {
+    node.as_ref().map(|node| {
+        Some(
+            Box::new(
+                Node {
+                    val: node.val,
+                    left: invert_binary_tree(&node.right),
+                    right: invert_binary_tree(&node.left),
+                }
+            )
+        )
+    }).flatten()
+}
 
 #[cfg(test)]
 mod tests {
@@ -241,6 +273,21 @@ mod tests {
         let tree = build_tree_from_str("1 x x");
         let result: usize = tree_max_depth::<i32>(*tree.unwrap());
         assert_eq!(result, 0)
+    }
+
+    #[test]
+    fn serialize_non_empty_tree() {
+        let tree: Option<Box<Node<i32>>> = build_tree_from_str("6 4 3 x x 5 x x 8 x x");
+        let result = serialize(tree);
+        assert_eq!(result, "6 4 3 x x 5 x x 8 x x")
+    }
+
+    #[test]
+    fn invert_binary_tree_should_return_inverted_tree() {
+        let tree: Option<Box<Node<i32>>> = build_tree_from_str("1 2 4 x x 5 6 x x x 3 x x");
+        let inverted_tree = invert_binary_tree(&tree);
+        let serialized_inverted_tree = serialize(inverted_tree);
+        assert_eq!(serialized_inverted_tree, "1 3 x x 2 5 x 6 x x 4 x x")
     }
 }
 
