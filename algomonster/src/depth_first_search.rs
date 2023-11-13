@@ -170,6 +170,35 @@ fn serialize<T>(node: Option<Box<Node<T>>>) -> String where T: Copy + Display {
 }
 
 #[allow(dead_code)]
+fn lowest_common_ancestor_in_binary_tree<'a, T: PartialEq>(
+    tree: &'a Option<Box<Node<T>>>,
+    node1: &'a Option<Box<Node<T>>>,
+    node2: &'a Option<Box<Node<T>>>,
+) -> &'a Option<Box<Node<T>>> {
+    if tree.is_none() {
+        return &None;
+    }
+    if tree == node1 || tree == node2 {
+        return tree;
+    }
+    if let Some(some_tree) = tree {
+        let left = lowest_common_ancestor_in_binary_tree(&some_tree.left, &node1, &node2);
+        let right = lowest_common_ancestor_in_binary_tree(&some_tree.right, &node1, &node2);
+
+        if left.is_some() && right.is_some() {
+            return tree;
+        }
+        if left.is_some() {
+            return left;
+        }
+        if right.is_some() {
+            return right;
+        }
+    }
+    &None
+}
+
+#[allow(dead_code)]
 fn invert_binary_tree<T>(node: &Option<Box<Node<T>>>) -> Option<Box<Node<T>>> where T: Copy {
     node.as_ref().map(|node| {
         Some(
@@ -190,14 +219,32 @@ fn is_valid_binary_search_tree(node: Option<Box<Node<i32>>>) -> bool {
         match node {
             None => true,
             Some(some_node) => {
-                if !((min_value < some_node.val) && (some_node.val<= max_value)) {
-                    return false
+                if !((min_value < some_node.val) && (some_node.val <= max_value)) {
+                    return false;
                 }
                 dfs(&some_node.left, min_value, some_node.val) && dfs(&some_node.right, some_node.val, max_value)
             }
         }
     }
     dfs(&node, i32::MIN, i32::MAX)
+}
+
+#[allow(dead_code)]
+fn find_node_binary_tree<T: PartialEq + Copy>(tree: &Option<Box<Node<T>>>, val: T) -> &Option<Box<Node<T>>> {
+    if let Some(ref some_tree) = tree {
+        return if some_tree.val == val {
+            tree
+        } else {
+            let left = find_node_binary_tree(&some_tree.left, val);
+            let right = find_node_binary_tree(&some_tree.right, val);
+            if left.is_some() {
+                left
+            } else {
+                right
+            }
+        };
+    }
+    &None
 }
 
 #[cfg(test)]
@@ -316,6 +363,32 @@ mod tests {
     fn is_valid_binary_search_tree_test_invalid_tree() {
         let tree: Option<Box<Node<i32>>> = build_tree_from_str("6 4 3 x x 8 x x 8 x x");
         assert_eq!(false, is_valid_binary_search_tree(tree))
+    }
+
+    #[test]
+    fn find_node_in_binary_tree_test() {
+        //        ┌─── 1 ───┐
+        //        ▼         ▼
+        //     ┌─ 2 ─┐   ┌─ 3 ─┐
+        //     ▼     ▼   ▼     ▼
+        //     4     5   6     7
+        let tree: Option<Box<Node<i32>>> = build_tree_from_str("1 2 4 x x 5 x x 3 6 x x 7 x x");
+        let result = find_node_binary_tree(&tree, 3).as_ref().unwrap();
+        assert_eq!(result.val, 3);
+    }
+
+    #[test]
+    fn lowest_common_ancestor_in_binary_tree_test() {
+        //        ┌─── 6 ───┐
+        //        ▼         ▼
+        //     ┌─ 4 ─┐      8
+        //     ▼     ▼
+        //     3     5
+        let tree: Option<Box<Node<i32>>> = build_tree_from_str("6 4 3 x x 5 x x 8 x x");
+        let node1 = find_node_binary_tree(&tree, 4);
+        let node2 = find_node_binary_tree(&tree, 8);
+        let result = lowest_common_ancestor_in_binary_tree(&tree, node1, node2);
+        assert_eq!(result, find_node_binary_tree(&tree, 6));
     }
 }
 
