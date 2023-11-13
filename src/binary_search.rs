@@ -36,6 +36,7 @@ pub fn find_boundary_binary_search(sorted: &Vec<bool>) -> Option<usize> {
     return if found { Some(boundary_index) } else { None };
 }
 
+#[allow(dead_code)]
 pub fn binary_search_first_matching<T: Ord>(input: &Vec<T>, matcher: impl Fn(&T) -> bool) -> Option<usize> {
     let mut left: usize = 0;
     let mut right: usize = input.len() - 1;
@@ -55,8 +56,31 @@ pub fn binary_search_first_matching<T: Ord>(input: &Vec<T>, matcher: impl Fn(&T)
     return if found { Some(first_matched_index) } else { None };
 }
 
+#[allow(dead_code)]
 fn binary_search_not_smaller<T: Ord>(input: &Vec<T>, target: T) -> Option<usize> {
     binary_search_first_matching(input, |x| *x >= target)
+}
+
+#[allow(dead_code)]
+fn binary_search_first_occurrence<T: Ord>(input: &Vec<T>, target: T) -> Option<usize> {
+    let mut left: usize = 0;
+    let mut right: usize = input.len() - 1;
+    let mut first_matched_index = 0;
+    let mut found = false;
+
+    while left <= right {
+        let mid = (left + right).wrapping_div(2);
+        if input[mid] == target {
+            first_matched_index = mid;
+            found = true;
+            right = mid - 1;
+        } else if input[mid] > target {
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return if found { Some(first_matched_index) } else { None };
 }
 
 #[test]
@@ -93,6 +117,7 @@ fn find_boundary_binary_search_given_only_false_should_not_find() {
     assert!(result.is_none());
 }
 
+
 #[test]
 fn binary_search_first_matching_should_find() {
     let given_input = vec![false, false, false, true, true, true, true];
@@ -100,7 +125,6 @@ fn binary_search_first_matching_should_find() {
 
     assert_eq!(result.unwrap(), 3);
 }
-
 
 #[test]
 fn binary_search_first_matching_given_only_false_should_not_find() {
@@ -116,4 +140,20 @@ fn binary_search_not_smaller_should_find() {
     let result = binary_search_not_smaller(&given_input, 6);
 
     assert_eq!(result.unwrap(), 3);
+}
+
+#[test]
+fn binary_search_first_occurrence_should_find() {
+    let given_input = vec![1, 3, 3, 3, 3, 6, 10, 10, 10, 100];
+    let result = binary_search_first_occurrence(&given_input, 3);
+
+    assert_eq!(result.unwrap(), 1);
+}
+
+#[test]
+fn binary_search_first_occurrence_should_not_find() {
+    let given_input = vec![2, 3, 5, 7, 11, 13, 17, 19];
+    let result = binary_search_first_occurrence(&given_input, 6);
+
+    assert!(result.is_none())
 }
