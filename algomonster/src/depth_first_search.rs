@@ -14,6 +14,7 @@
 //!
 //! **Balanced Binary Tree** - the height difference of the left and right subtree of the node is not more than 1 
 //!
+use std::cmp::max;
 use std::ops::Deref;
 use std::slice::Iter;
 use std::str::FromStr;
@@ -128,6 +129,29 @@ fn post_order_traversal<T>(node: &Node<T>) -> Vec<T> where T: Copy {
 }
 
 
+#[allow(dead_code)]
+fn tree_max_depth<T>(node: Node<T>) -> usize {
+    fn dfs<T>(maybe_node: Option<Box<Node<T>>>) -> usize {
+        match maybe_node {
+            None => 0,
+            Some(node) => 1 + max(
+                dfs(node.left),
+                dfs(node.right),
+            ),
+        }
+    }
+    dfs(Some(Box::new(node))) - 1
+    // Alternate solution
+    // let left_depth: usize = if let Some(left) = &node.left {
+    //     tree_max_depth(left) + 1
+    // } else { 0 };
+    // let right_depth: usize = if let Some(right) = &node.right {
+    //     tree_max_depth(right) + 1
+    // } else { 0 };
+    // max(left_depth, right_depth)
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -203,6 +227,20 @@ mod tests {
         let result: Vec<i32> = post_order_traversal(&tree.unwrap());
 
         assert_eq!(result, vec![4, 5, 2, 6, 7, 3, 1])
+    }
+
+    #[test]
+    fn tree_max_depth_should_calculate_for_non_empty() {
+        let tree = build_tree_from_str("1 2 4 x x 5 x x 3 6 x x 7 x x");
+        let result: usize = tree_max_depth::<i32>(*tree.unwrap());
+        assert_eq!(result, 2)
+    }
+
+    #[test]
+    fn tree_max_depth_should_calculate_for_root_only() {
+        let tree = build_tree_from_str("1 x x");
+        let result: usize = tree_max_depth::<i32>(*tree.unwrap());
+        assert_eq!(result, 0)
     }
 }
 
