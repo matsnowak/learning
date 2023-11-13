@@ -55,6 +55,10 @@ pub fn binary_search_first_matching<T: Ord>(input: &Vec<T>, matcher: impl Fn(&T)
     return if found { Some(first_matched_index) } else { None };
 }
 
+fn binary_search_not_smaller<T: Ord>(input: &Vec<T>, target: T) -> Option<usize> {
+    binary_search_first_matching(input, |x| *x >= target)
+}
+
 #[test]
 fn vanilla_binary_search_should_find() {
     let given_vector = vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -97,10 +101,19 @@ fn binary_search_first_matching_should_find() {
     assert_eq!(result.unwrap(), 3);
 }
 
+
 #[test]
 fn binary_search_first_matching_given_only_false_should_not_find() {
     let given_input = vec![false, false, false, false, false];
     let result = binary_search_first_matching(&given_input, |x| *x == true);
 
     assert!(result.is_none());
+}
+
+#[test]
+fn binary_search_not_smaller_should_find() {
+    let given_input = vec![2, 3, 5, 7, 11, 13, 17, 19];
+    let result = binary_search_not_smaller(&given_input, 6);
+
+    assert_eq!(result.unwrap(), 3);
 }
