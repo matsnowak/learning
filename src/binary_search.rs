@@ -102,6 +102,11 @@ fn binary_search_square_root_estimation(n: i32) -> i32 {
     return res - 1;
 }
 
+#[allow(dead_code)]
+fn binary_search_minimum_in_rotated_array<T: Ord>(input: &Vec<T>) -> usize {
+    binary_search_first_matching(input, |x| *x < *input.last().unwrap()).unwrap()
+}
+
 #[test]
 fn vanilla_binary_search_should_find() {
     let given_vector = vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -120,6 +125,7 @@ fn vanilla_binary_search_should_not_find() {
     assert!(result.is_none())
 }
 
+
 #[test]
 fn find_boundary_binary_search_should_find() {
     let given_input = vec![false, false, false, true, true, true, true];
@@ -127,7 +133,6 @@ fn find_boundary_binary_search_should_find() {
 
     assert_eq!(result.unwrap(), 3);
 }
-
 
 #[test]
 fn find_boundary_binary_search_given_only_false_should_not_find() {
@@ -185,4 +190,12 @@ fn binary_search_square_root_estimation_is_exactly_integer() {
 #[test]
 fn binary_search_square_root_estimation_is_not_integer() {
     assert_eq!(binary_search_square_root_estimation(8), 2);
+}
+
+#[test]
+fn binary_search_minimum_in_rotated_array_should_find() {
+    let given_input = vec![30, 40, 50, 10, 20];
+    let result = binary_search_minimum_in_rotated_array(&given_input);
+
+    assert_eq!(result, 3);
 }
