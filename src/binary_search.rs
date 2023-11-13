@@ -107,6 +107,29 @@ fn binary_search_minimum_in_rotated_array<T: Ord>(input: &Vec<T>) -> usize {
     binary_search_first_matching(input, |x| *x < *input.last().unwrap()).unwrap()
 }
 
+#[allow(dead_code)]
+fn binary_search_peek_of_mountain(input: &Vec<i32>) -> Option<usize> {
+    let mut left = 0;
+    let mut right = input.len() - 1;
+    let mut found = false;
+    let mut result = 0;
+
+    while left <= right {
+        let mid = (left + right).wrapping_div(2);
+        // `mid == input.len() - 1` - edge case for checking last element
+        if mid == input.len() - 1 || input[mid] >= input[mid + 1] {
+            found = true;
+            result = mid;
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    if found == true { Some(result) } else { None }
+}
+
+
+
 #[test]
 fn vanilla_binary_search_should_find() {
     let given_vector = vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -198,4 +221,12 @@ fn binary_search_minimum_in_rotated_array_should_find() {
     let result = binary_search_minimum_in_rotated_array(&given_input);
 
     assert_eq!(result, 3);
+}
+
+#[test]
+fn binary_search_peak_of_mountain_should_find() {
+    let given_input = vec![0, 1, 2, 3, 2, 1, 0];
+    let result = binary_search_peek_of_mountain(&given_input);
+
+    assert_eq!(result, Some(3));
 }
