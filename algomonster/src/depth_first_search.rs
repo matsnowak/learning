@@ -85,54 +85,60 @@ fn in_order_traversal_recursive<T>(node: &Node<T>, output: &mut Vec<T>) -> () wh
 }
 
 #[allow(dead_code)]
-fn in_order_traversal<T>(node: &Node<T>) -> Vec<T> where T: Copy{
+fn in_order_traversal<T>(node: &Node<T>) -> Vec<T> where T: Copy {
     let mut output: Vec<T> = Vec::new();
     in_order_traversal_recursive(node, &mut output);
     output
 }
 
-#[test]
-fn build_tree_from_str_should_return_empty_tree() {
-    let input = "x";
-    let result: Option<Box<Node<i32>>> = build_tree_from_str(input);
-    assert!(result.is_none());
-}
 
-#[test]
-fn build_tree_from_str_should_return_a_tree() {
-    let input = "5 4 3 x x 8 x x 6 x x";
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn build_tree_from_str_should_return_empty_tree() {
+        let input = "x";
+        let result: Option<Box<Node<i32>>> = build_tree_from_str(input);
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn build_tree_from_str_should_return_a_tree() {
+        let input = "5 4 3 x x 8 x x 6 x x";
 
 //             ┌── 5 ──┐
 //             ▼       ▼
 //          ┌─ 4 ─┐    6
 //          ▼     ▼
 //          3     8
-    let expected_tree: Node<i32> =
-        Node::new(5)
-            .left(
-                Node::new(4)
-                    .left(Node::new(3))
-                    .right(Node::new(8))
-            )
-            .right(
-                Node::new(6)
-            );
+        let expected_tree: Node<i32> =
+            Node::new(5)
+                .left(
+                    Node::new(4)
+                        .left(Node::new(3))
+                        .right(Node::new(8))
+                )
+                .right(
+                    Node::new(6)
+                );
 
-    let result: Option<Box<Node<i32>>> = build_tree_from_str(input);
-    assert_eq!(result, Some(Box::new(expected_tree)));
-}
+        let result: Option<Box<Node<i32>>> = build_tree_from_str(input);
+        assert_eq!(result, Some(Box::new(expected_tree)));
+    }
 
-#[test]
-fn inorder_traversal_non_empty_tree() {
-    let tree = build_tree_from_str("1 2 4 x x 5 x x 3 6 x x 7 x x");
+    #[test]
+    fn inorder_traversal_non_empty_tree() {
+        let tree = build_tree_from_str("1 2 4 x x 5 x x 3 6 x x 7 x x");
 //        ┌─── 1 ───┐
 //        ▼         ▼
 //     ┌─ 2 ─┐   ┌─ 3 ─┐
 //     ▼     ▼   ▼     ▼
 //     4     5   6     7
 
-    let result: Vec<i32> = in_order_traversal(&tree.unwrap());
+        let result: Vec<i32> = in_order_traversal(&tree.unwrap());
 
-    assert_eq!(result, vec![4, 2, 5, 1, 6, 3, 7])
+        assert_eq!(result, vec![4, 2, 5, 1, 6, 3, 7])
+    }
 }
 

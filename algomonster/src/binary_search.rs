@@ -128,105 +128,108 @@ fn binary_search_peek_of_mountain(input: &Vec<i32>) -> Option<usize> {
     if found == true { Some(result) } else { None }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn vanilla_binary_search_should_find() {
+        let given_vector = vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+        let given_target = 70;
+        let result = vanilla_binary_search(&given_vector, given_target);
+
+        assert_eq!(given_vector[result.unwrap()], given_target);
+    }
+
+    #[test]
+    fn vanilla_binary_search_should_not_find() {
+        let given_vector = vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+        let given_target = 25;
+        let result = vanilla_binary_search(&given_vector, given_target);
+
+        assert!(result.is_none())
+    }
 
 
-#[test]
-fn vanilla_binary_search_should_find() {
-    let given_vector = vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-    let given_target = 70;
-    let result = vanilla_binary_search(&given_vector, given_target);
+    #[test]
+    fn find_boundary_binary_search_should_find() {
+        let given_input = vec![false, false, false, true, true, true, true];
+        let result = find_boundary_binary_search(&given_input);
 
-    assert_eq!(given_vector[result.unwrap()], given_target);
-}
+        assert_eq!(result.unwrap(), 3);
+    }
 
-#[test]
-fn vanilla_binary_search_should_not_find() {
-    let given_vector = vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-    let given_target = 25;
-    let result = vanilla_binary_search(&given_vector, given_target);
+    #[test]
+    fn find_boundary_binary_search_given_only_false_should_not_find() {
+        let given_input = vec![false, false, false, false, false];
+        let result = find_boundary_binary_search(&given_input);
 
-    assert!(result.is_none())
-}
+        assert!(result.is_none());
+    }
 
+    #[test]
+    fn binary_search_first_matching_should_find() {
+        let given_input = vec![false, false, false, true, true, true, true];
+        let result = binary_search_first_matching(&given_input, |x| *x == true);
 
-#[test]
-fn find_boundary_binary_search_should_find() {
-    let given_input = vec![false, false, false, true, true, true, true];
-    let result = find_boundary_binary_search(&given_input);
+        assert_eq!(result.unwrap(), 3);
+    }
 
-    assert_eq!(result.unwrap(), 3);
-}
+    #[test]
+    fn binary_search_first_matching_given_only_false_should_not_find() {
+        let given_input = vec![false, false, false, false, false];
+        let result = binary_search_first_matching(&given_input, |x| *x == true);
 
-#[test]
-fn find_boundary_binary_search_given_only_false_should_not_find() {
-    let given_input = vec![false, false, false, false, false];
-    let result = find_boundary_binary_search(&given_input);
+        assert!(result.is_none());
+    }
 
-    assert!(result.is_none());
-}
+    #[test]
+    fn binary_search_not_smaller_should_find() {
+        let given_input = vec![2, 3, 5, 7, 11, 13, 17, 19];
+        let result = binary_search_not_smaller(&given_input, 6);
 
-#[test]
-fn binary_search_first_matching_should_find() {
-    let given_input = vec![false, false, false, true, true, true, true];
-    let result = binary_search_first_matching(&given_input, |x| *x == true);
+        assert_eq!(result.unwrap(), 3);
+    }
 
-    assert_eq!(result.unwrap(), 3);
-}
+    #[test]
+    fn binary_search_first_occurrence_should_find() {
+        let given_input = vec![1, 3, 3, 3, 3, 6, 10, 10, 10, 100];
+        let result = binary_search_first_occurrence(&given_input, 3);
 
-#[test]
-fn binary_search_first_matching_given_only_false_should_not_find() {
-    let given_input = vec![false, false, false, false, false];
-    let result = binary_search_first_matching(&given_input, |x| *x == true);
+        assert_eq!(result.unwrap(), 1);
+    }
 
-    assert!(result.is_none());
-}
+    #[test]
+    fn binary_search_first_occurrence_should_not_find() {
+        let given_input = vec![2, 3, 5, 7, 11, 13, 17, 19];
+        let result = binary_search_first_occurrence(&given_input, 6);
 
-#[test]
-fn binary_search_not_smaller_should_find() {
-    let given_input = vec![2, 3, 5, 7, 11, 13, 17, 19];
-    let result = binary_search_not_smaller(&given_input, 6);
+        assert!(result.is_none())
+    }
 
-    assert_eq!(result.unwrap(), 3);
-}
+    #[test]
+    fn binary_search_square_root_estimation_is_exactly_integer() {
+        assert_eq!(binary_search_square_root_estimation(9), 3);
+    }
 
-#[test]
-fn binary_search_first_occurrence_should_find() {
-    let given_input = vec![1, 3, 3, 3, 3, 6, 10, 10, 10, 100];
-    let result = binary_search_first_occurrence(&given_input, 3);
+    #[test]
+    fn binary_search_square_root_estimation_is_not_integer() {
+        assert_eq!(binary_search_square_root_estimation(8), 2);
+    }
 
-    assert_eq!(result.unwrap(), 1);
-}
+    #[test]
+    fn binary_search_minimum_in_rotated_array_should_find() {
+        let given_input = vec![30, 40, 50, 10, 20];
+        let result = binary_search_minimum_in_rotated_array(&given_input);
 
-#[test]
-fn binary_search_first_occurrence_should_not_find() {
-    let given_input = vec![2, 3, 5, 7, 11, 13, 17, 19];
-    let result = binary_search_first_occurrence(&given_input, 6);
+        assert_eq!(result, 3);
+    }
 
-    assert!(result.is_none())
-}
+    #[test]
+    fn binary_search_peak_of_mountain_should_find() {
+        let given_input = vec![0, 1, 2, 3, 2, 1, 0];
+        let result = binary_search_peek_of_mountain(&given_input);
 
-#[test]
-fn binary_search_square_root_estimation_is_exactly_integer() {
-    assert_eq!(binary_search_square_root_estimation(9), 3);
-}
-
-#[test]
-fn binary_search_square_root_estimation_is_not_integer() {
-    assert_eq!(binary_search_square_root_estimation(8), 2);
-}
-
-#[test]
-fn binary_search_minimum_in_rotated_array_should_find() {
-    let given_input = vec![30, 40, 50, 10, 20];
-    let result = binary_search_minimum_in_rotated_array(&given_input);
-
-    assert_eq!(result, 3);
-}
-
-#[test]
-fn binary_search_peak_of_mountain_should_find() {
-    let given_input = vec![0, 1, 2, 3, 2, 1, 0];
-    let result = binary_search_peek_of_mountain(&given_input);
-
-    assert_eq!(result, Some(3));
+        assert_eq!(result, Some(3));
+    }
 }
