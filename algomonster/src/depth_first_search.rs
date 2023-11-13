@@ -14,6 +14,7 @@
 //!
 //! **Balanced Binary Tree** - the height difference of the left and right subtree of the node is not more than 1 
 //!
+use std::ops::Deref;
 use std::slice::Iter;
 use std::str::FromStr;
 
@@ -26,7 +27,7 @@ struct Node<T> {
 }
 
 #[allow(dead_code)]
-impl<T> Node<T> {
+impl<T> Node<T> where T: Copy {
     fn new(value: T) -> Self {
         Node {
             val: value,
@@ -48,7 +49,7 @@ impl<T> Node<T> {
 #[allow(dead_code)]
 fn build_tree_from_str<T>(input: &str) -> Option<Box<Node<T>>> where T: FromStr {
     let tokens: Vec<&str> = input.split(' ').collect();
-    let token_iterator= &mut tokens.iter();
+    let token_iterator = &mut tokens.iter();
     build_tree(token_iterator)
 }
 
@@ -70,6 +71,24 @@ fn build_tree<'a, T>(nodes: &mut Iter<&str>) -> Option<Box<Node<T>>> where T: Fr
                 )
             )
     }
+}
+
+#[allow(dead_code)]
+fn in_order_traversal_recursive<T>(node: &Node<T>, output: &mut Vec<T>) -> () where T: Copy {
+    if let Some(node_box) = &node.left {
+        in_order_traversal_recursive(node_box.deref(), output)
+    }
+    output.push(node.val);
+    if let Some(node_box) = &node.right {
+        in_order_traversal_recursive(node_box.deref(), output)
+    }
+}
+
+#[allow(dead_code)]
+fn in_order_traversal<T>(node: &Node<T>) -> Vec<T> where T: Copy{
+    let mut output: Vec<T> = Vec::new();
+    in_order_traversal_recursive(node, &mut output);
+    output
 }
 
 #[test]
@@ -101,5 +120,19 @@ fn build_tree_from_str_should_return_a_tree() {
 
     let result: Option<Box<Node<i32>>> = build_tree_from_str(input);
     assert_eq!(result, Some(Box::new(expected_tree)));
+}
+
+#[test]
+fn inorder_traversal_non_empty_tree() {
+    let tree = build_tree_from_str("1 2 4 x x 5 x x 3 6 x x 7 x x");
+//        ┌─── 1 ───┐
+//        ▼         ▼
+//     ┌─ 2 ─┐   ┌─ 3 ─┐
+//     ▼     ▼   ▼     ▼
+//     4     5   6     7
+
+    let result: Vec<i32> = in_order_traversal(&tree.unwrap());
+
+    assert_eq!(result, vec![4, 2, 5, 1, 6, 3, 7])
 }
 
