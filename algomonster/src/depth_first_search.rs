@@ -91,6 +91,24 @@ fn in_order_traversal<T>(node: &Node<T>) -> Vec<T> where T: Copy {
     output
 }
 
+#[allow(dead_code)]
+fn post_order_traversal_recursive<T>(node: &Node<T>, output: &mut Vec<T>) -> () where T: Copy {
+    if let Some(node_box) = &node.left {
+        post_order_traversal_recursive(node_box.deref(), output)
+    }
+    if let Some(node_box) = &node.right {
+        post_order_traversal_recursive(node_box.deref(), output)
+    }
+    output.push(node.val);
+}
+
+#[allow(dead_code)]
+fn post_order_traversal<T>(node: &Node<T>) -> Vec<T> where T: Copy {
+    let mut output: Vec<T> = Vec::new();
+    post_order_traversal_recursive(node, &mut output);
+    output
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -128,7 +146,7 @@ mod tests {
     }
 
     #[test]
-    fn inorder_traversal_non_empty_tree() {
+    fn in_order_traversal_non_empty_tree() {
         let tree = build_tree_from_str("1 2 4 x x 5 x x 3 6 x x 7 x x");
 //        ┌─── 1 ───┐
 //        ▼         ▼
@@ -139,6 +157,20 @@ mod tests {
         let result: Vec<i32> = in_order_traversal(&tree.unwrap());
 
         assert_eq!(result, vec![4, 2, 5, 1, 6, 3, 7])
+    }
+
+    #[test]
+    fn post_order_traversal_non_empty_tree() {
+        let tree = build_tree_from_str("1 2 4 x x 5 x x 3 6 x x 7 x x");
+//        ┌─── 1 ───┐
+//        ▼         ▼
+//     ┌─ 2 ─┐   ┌─ 3 ─┐
+//     ▼     ▼   ▼     ▼
+//     4     5   6     7
+
+        let result: Vec<i32> = post_order_traversal(&tree.unwrap());
+
+        assert_eq!(result, vec![4, 5, 2, 6, 7, 3, 1])
     }
 }
 
