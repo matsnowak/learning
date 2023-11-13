@@ -184,6 +184,22 @@ fn invert_binary_tree<T>(node: &Option<Box<Node<T>>>) -> Option<Box<Node<T>>> wh
     }).flatten()
 }
 
+#[allow(dead_code)]
+fn is_valid_binary_search_tree(node: Option<Box<Node<i32>>>) -> bool {
+    fn dfs(node: &Option<Box<Node<i32>>>, min_value: i32, max_value: i32) -> bool {
+        match node {
+            None => true,
+            Some(some_node) => {
+                if !((min_value < some_node.val) && (some_node.val<= max_value)) {
+                    return false
+                }
+                dfs(&some_node.left, min_value, some_node.val) && dfs(&some_node.right, some_node.val, max_value)
+            }
+        }
+    }
+    dfs(&node, i32::MIN, i32::MAX)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -288,6 +304,18 @@ mod tests {
         let inverted_tree = invert_binary_tree(&tree);
         let serialized_inverted_tree = serialize(inverted_tree);
         assert_eq!(serialized_inverted_tree, "1 3 x x 2 5 x 6 x x 4 x x")
+    }
+
+    #[test]
+    fn is_valid_binary_search_tree_test_valid_tree() {
+        let tree: Option<Box<Node<i32>>> = build_tree_from_str("6 4 3 x x 5 x x 8 x x");
+        assert_eq!(true, is_valid_binary_search_tree(tree))
+    }
+
+    #[test]
+    fn is_valid_binary_search_tree_test_invalid_tree() {
+        let tree: Option<Box<Node<i32>>> = build_tree_from_str("6 4 3 x x 8 x x 8 x x");
+        assert_eq!(false, is_valid_binary_search_tree(tree))
     }
 }
 
