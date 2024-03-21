@@ -1,28 +1,28 @@
 use std::mem;
 
-pub struct List {
-    head: Link,
+pub struct List<T> {
+    head: Link<T>,
 }
 
-type Link = Option<Box<Node>>;
+type Link<T> = Option<Box<Node<T>>>;
 
-struct Node {
-    elem: i32,
-    next: Link,
+struct Node<T> {
+    elem: T,
+    next: Link<T>,
 }
 
-impl Default for List {
+impl<T> Default for List<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl List {
+impl<T> List<T> {
     pub fn new() -> Self {
         List { head: Link::None }
     }
 
-    pub fn push(&mut self, elem: i32) {
+    pub fn push(&mut self, elem: T) {
         let new_node = Box::new(Node {
             elem,
             next: self.head.take(),
@@ -31,7 +31,7 @@ impl List {
         self.head = Link::Some(new_node);
     }
 
-    pub fn pop(&mut self) -> Option<i32> {
+    pub fn pop(&mut self) -> Option<T> {
         self.head.take().map(|node| {
             self.head = node.next;
             node.elem
@@ -39,7 +39,7 @@ impl List {
     }
 }
 
-impl Drop for List {
+impl<T> Drop for List<T> {
     fn drop(&mut self) {
         let mut curr_link = self.head.take();
 
