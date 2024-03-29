@@ -1,4 +1,4 @@
-use std::{borrow::BorrowMut, cell::RefCell, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 pub struct List<T> {
     head: Link<T>,
@@ -33,7 +33,6 @@ impl<T> List<T> {
 
     pub fn push_front(&mut self, elem: T) {
         let new_head = Node::new(elem);
-
         match self.head.take() {
             Some(old_head) => {
                 old_head.borrow_mut().prev = Some(new_head.clone());
@@ -60,12 +59,6 @@ impl<T> List<T> {
             }
             Rc::try_unwrap(old_head).ok().unwrap().into_inner().elem
         })
-    }
-}
-
-impl<T> Default for List<T> {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
