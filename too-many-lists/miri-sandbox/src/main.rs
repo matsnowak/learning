@@ -1,9 +1,19 @@
+use std::cell::{Cell, UnsafeCell};
+
 fn main() {
     // mian1();
     // main2();
     // main3();
     // main4();
-    main5();
+    // main5();
+    // main6();
+    // main7();
+    // main8();
+    // main9();
+    // main10();
+    // main11();
+    // main12();
+    main13();
 }
 
 fn mian1() {
@@ -109,5 +119,137 @@ fn main5() {
 
         // Should be [8, 12, 4, 6, 8, 10, 12, 14, 16, 18]
         println!("{:?}", &data[..]);
+    }
+}
+
+fn opaque_read(val: &i32) {
+    println!("{}", val);
+}
+
+fn main6() {
+    unsafe {
+        let mut data = 10;
+        let mref1 = &mut data;
+        let sref2 = &mref1;
+        let sref3 = sref2;
+        let sref4 = &*sref2;
+
+        opaque_read(sref3);
+        opaque_read(sref2);
+        opaque_read(sref4);
+        opaque_read(sref2);
+        opaque_read(sref3);
+
+        *mref1 += 1;
+
+        opaque_read(&data);
+    }
+}
+
+fn main7() {
+    unsafe {
+        let mut data = 10;
+        let mref1 = &mut data;
+        let ptr2 = mref1 as *mut i32;
+        let sref3 = &*mref1;
+        let ptr4 = sref3 as *const i32 as *mut i32;
+
+        opaque_read(&*ptr4);
+        opaque_read(sref3);
+        *ptr2 += 2;
+        *mref1 += 1;
+
+        opaque_read(&data);
+    }
+}
+
+fn main8() {
+    unsafe {
+        let mut data = 10;
+        let mref1 = &mut data;
+        let ptr2 = mref1 as *mut i32;
+        let sref3 = &*mref1;
+
+        *ptr2 += 2;
+        opaque_read(sref3); // Read in the wrong order?
+        *mref1 += 1;
+
+        opaque_read(&data);
+    }
+}
+fn main9() {
+    unsafe {
+        let mut data = Cell::new(10);
+        let mref1 = &mut data;
+        let ptr2 = mref1 as *mut Cell<i32>;
+        let sref3 = &*mref1;
+
+        sref3.set(sref3.get() + 3);
+        (*ptr2).set((*ptr2).get() + 2);
+        mref1.set(mref1.get() + 1);
+
+        println!("{}", data.get());
+    }
+}
+
+fn main10() {
+    unsafe {
+        let mut data = UnsafeCell::new(10);
+        let mref1 = data.get_mut(); // Get a mutable ref to the contents
+        let ptr2 = mref1 as *mut i32;
+        let sref3 = &*ptr2;
+
+        *ptr2 += 2;
+        opaque_read(sref3);
+        *mref1 += 1;
+
+        println!("{}", *data.get());
+    }
+}
+
+fn main11() {
+    unsafe {
+        let mut data = UnsafeCell::new(10);
+        let mref1 = &mut data; // Mutable ref to the *outside*
+        let ptr2 = mref1.get(); // Get a raw pointer to the insides
+        let sref3 = &*mref1; // Get a shared ref to the *outside*
+
+        *ptr2 += 2; // Mutate with the raw pointer
+        opaque_read(&*sref3.get()); // Read from the shared ref
+        *sref3.get() += 3; // Write through the shared ref
+        *mref1.get() += 1; // Mutate with the mutable ref
+
+        println!("{}", *data.get());
+    }
+}
+
+fn main12() {
+    unsafe {
+        let mut data = UnsafeCell::new(10);
+        let mref1 = &mut data;
+        // These two are swapped so the borrows are *definitely* totally stacked
+        let sref2 = &*mref1;
+        // Derive the ptr from the shared ref to be super safe!
+        let ptr3 = sref2.get();
+
+        *ptr3 += 3;
+        opaque_read(&*sref2.get());
+        *sref2.get() += 2;
+        *mref1.get() += 1;
+
+        println!("{}", *data.get());
+    }
+}
+
+fn main13() {
+    unsafe {
+        let mut data = Box::new(10);
+        let ptr1 = (&mut *data) as *mut i32;
+
+        *ptr1 += 1;
+        *data += 10;
+
+        // Should be 21
+        println!("{}", data);
     }
 }
