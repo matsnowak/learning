@@ -1,5 +1,5 @@
 #[allow(dead_code)]
-pub fn vanilla_binary_search<T: Ord>(sorted: &Vec<T>, target: T) -> Option<usize> {
+pub(crate) fn vanilla_binary_search<T: Ord>(sorted: &[T], target: T) -> Option<usize> {
     let mut left: usize = 0;
     let mut right: usize = sorted.len() - 1;
     while left <= right {
@@ -13,11 +13,11 @@ pub fn vanilla_binary_search<T: Ord>(sorted: &Vec<T>, target: T) -> Option<usize
             right = mid - 1;
         }
     }
-    return None;
+    None
 }
 
 #[allow(dead_code)]
-pub fn find_boundary_binary_search(sorted: &Vec<bool>) -> Option<usize> {
+pub fn find_boundary_binary_search(sorted: &[bool]) -> Option<usize> {
     let mut left: usize = 0;
     let mut right: usize = sorted.len() - 1;
     let mut boundary_index = 0;
@@ -33,11 +33,18 @@ pub fn find_boundary_binary_search(sorted: &Vec<bool>) -> Option<usize> {
             left = mid + 1;
         }
     }
-    return if found { Some(boundary_index) } else { None };
+    if found {
+        Some(boundary_index)
+    } else {
+        None
+    }
 }
 
 #[allow(dead_code)]
-pub fn binary_search_first_matching<T: Ord>(input: &Vec<T>, matcher: impl Fn(&T) -> bool) -> Option<usize> {
+pub fn binary_search_first_matching<T: Ord>(
+    input: &Vec<T>,
+    matcher: impl Fn(&T) -> bool,
+) -> Option<usize> {
     let mut left: usize = 0;
     let mut right: usize = input.len() - 1;
     let mut first_matched_index = 0;
@@ -53,7 +60,11 @@ pub fn binary_search_first_matching<T: Ord>(input: &Vec<T>, matcher: impl Fn(&T)
             left = mid + 1;
         }
     }
-    return if found { Some(first_matched_index) } else { None };
+    if found {
+        Some(first_matched_index)
+    } else {
+        None
+    }
 }
 
 #[allow(dead_code)]
@@ -62,6 +73,7 @@ fn binary_search_not_smaller<T: Ord>(input: &Vec<T>, target: T) -> Option<usize>
 }
 
 #[allow(dead_code)]
+#[allow(clippy::comparison_chain)]
 fn binary_search_first_occurrence<T: Ord>(input: &Vec<T>, target: T) -> Option<usize> {
     let mut left: usize = 0;
     let mut right: usize = input.len() - 1;
@@ -80,9 +92,14 @@ fn binary_search_first_occurrence<T: Ord>(input: &Vec<T>, target: T) -> Option<u
             left = mid + 1;
         }
     }
-    return if found { Some(first_matched_index) } else { None };
+    if found {
+        Some(first_matched_index)
+    } else {
+        None
+    }
 }
 
+#[allow(clippy::comparison_chain)]
 #[allow(dead_code)]
 fn binary_search_square_root_estimation(n: i32) -> i32 {
     let mut left = 0;
@@ -99,7 +116,7 @@ fn binary_search_square_root_estimation(n: i32) -> i32 {
             left = mid + 1;
         }
     }
-    return res - 1;
+    res - 1
 }
 
 #[allow(dead_code)]
@@ -108,7 +125,7 @@ fn binary_search_minimum_in_rotated_array<T: Ord>(input: &Vec<T>) -> usize {
 }
 
 #[allow(dead_code)]
-fn binary_search_peek_of_mountain(input: &Vec<i32>) -> Option<usize> {
+fn binary_search_peek_of_mountain(input: &[i32]) -> Option<usize> {
     let mut left = 0;
     let mut right = input.len() - 1;
     let mut found = false;
@@ -125,7 +142,11 @@ fn binary_search_peek_of_mountain(input: &Vec<i32>) -> Option<usize> {
             left = mid + 1;
         }
     }
-    if found == true { Some(result) } else { None }
+    if found {
+        Some(result)
+    } else {
+        None
+    }
 }
 
 #[cfg(test)]
@@ -150,7 +171,6 @@ mod tests {
         assert!(result.is_none())
     }
 
-
     #[test]
     fn find_boundary_binary_search_should_find() {
         let given_input = vec![false, false, false, true, true, true, true];
@@ -170,7 +190,7 @@ mod tests {
     #[test]
     fn binary_search_first_matching_should_find() {
         let given_input = vec![false, false, false, true, true, true, true];
-        let result = binary_search_first_matching(&given_input, |x| *x == true);
+        let result = binary_search_first_matching(&given_input, |x| *x);
 
         assert_eq!(result.unwrap(), 3);
     }
@@ -178,7 +198,7 @@ mod tests {
     #[test]
     fn binary_search_first_matching_given_only_false_should_not_find() {
         let given_input = vec![false, false, false, false, false];
-        let result = binary_search_first_matching(&given_input, |x| *x == true);
+        let result = binary_search_first_matching(&given_input, |x| *x);
 
         assert!(result.is_none());
     }
