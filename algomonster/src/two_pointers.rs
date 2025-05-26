@@ -230,9 +230,46 @@ fn container_with_max_area(height: Vec<i32>) -> i32 {
     }
     max_area   
 }
+/// Finds the maximum sum of a fixed-length subarray within a given array.
+///
+/// This function uses a sliding window approach to find the subarray of length `k`
+/// with the maximum sum in the input array.
+///
+/// # Arguments
+/// * `arr` - A vector of integers representing the input array
+/// * `k` - The fixed length of the subarray to consider
+///
+/// # Returns
+/// * `i32` - The maximum sum found among all possible subarrays of length `k`
+///
+/// # Example
+/// ```
+/// let arr = vec![1, 4, 2, 10, 2, 3, 1, 0, 20];
+/// let k = 4;
+/// let max_sum = subarray_sum_fixed_length(arr, k);
+/// assert_eq!(max_sum, 24); // sum of subarray [2, 10, 2, 3]
+/// ```
+///
+/// # Complexity
+/// * Time Complexity: O(n), where n is the length of the input array
+/// * Space Complexity: O(1)
+fn subarray_sum_fixed_length(arr: Vec<i32>, k: usize) -> i32 {
+    let mut window_sum = 0;
+    for i in 0..k {
+        window_sum += arr[i];
+    }
+
+    let mut largest = window_sum;
+    for right in k as usize..arr.len() {
+        window_sum += arr[right];
+        window_sum -= arr[right - k];
+        largest = std::cmp::max(largest, window_sum);
+    }
+    largest
+}
 #[cfg(test)]
 mod test {
-    use crate::two_pointers::{remove_duplicates, middle_of_linked_list, List, Node, two_sum_sorted, container_with_max_area};
+    use crate::two_pointers::{remove_duplicates, middle_of_linked_list, List, Node, two_sum_sorted, container_with_max_area, subarray_sum_fixed_length};
 
     // Helper function to create a linked list from a vector for easier testing
     fn to_list(vec: Vec<i32>) -> List<i32> {
@@ -347,5 +384,23 @@ mod test {
     fn container_with_max_area_non_adjacent() {
         let heights = vec![1, 2, 4, 3, 7];
         assert_eq!(container_with_max_area(heights), 8);
+    }
+
+    #[test]
+    fn subarray_sum_fixed_length_typical_case() {
+        let arr = vec![1, 4, 2, 10, 2, 3, 1, 0, 20];
+        assert_eq!(subarray_sum_fixed_length(arr, 4), 24);
+    }
+
+    #[test]
+    fn subarray_sum_fixed_length_entire_array() {
+        let arr = vec![1, 2, 3];
+        assert_eq!(subarray_sum_fixed_length(arr, 3), 6);
+    }
+
+    #[test]
+    fn subarray_sum_fixed_length_single_element() {
+        let arr = vec![5, 2, 1, 3];
+        assert_eq!(subarray_sum_fixed_length(arr, 1), 5);
     }
 }
