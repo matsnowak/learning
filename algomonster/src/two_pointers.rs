@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 /// Removes duplicate elements from a sorted vector in-place
 /// and returns the number of unique elements.
 ///
@@ -7,7 +9,7 @@
 ///
 /// # Parameters
 /// - `arr`: A mutable reference to a vector of i32 values. 
-///   The vector must be sorted prior to calling this function, 
+///   The vector must be sorted before calling this function, 
 ///   as the function assumes the sorted order of elements for removing duplicates.
 ///
 /// # Returns
@@ -260,18 +262,180 @@ fn subarray_sum_fixed_length(arr: Vec<i32>, k: usize) -> i32 {
     }
 
     let mut largest = window_sum;
-    for right in k as usize..arr.len() {
+    for right in k..arr.len() {
         window_sum += arr[right];
         window_sum -= arr[right - k];
         largest = std::cmp::max(largest, window_sum);
     }
     largest
 }
+
+
+/// Finds a contiguous subarray within a given array `arr` that sums up to a specified target value
+/// and returns the 1-based starting and ending indices of that subarray. If no such subarray exists,
+/// it returns an empty vector.
+///
+/// # Arguments
+///
+/// * `arr` - A vector of integers, representing the array to search for the subarray.
+/// * `target` - An integer, representing the target sum to look for in the subarray.
+///
+/// # Returns
+///
+/// * A vector of two integers containing the 1-based starting and ending indices of the subarray
+///   that sums to the target value. Returns an empty vector if such a subarray cannot be found.
+///
+/// # Example
+///
+/// ```
+/// use std::collections::HashMap;
+///
+/// let arr = vec![1, 2, 3, 4, 5];
+/// let target = 9;
+/// let result = subarray_sum(arr, target);
+/// assert_eq!(result, vec![2, 4]); // Subarray [2, 3, 4] sums to 9.
+///
+/// let arr = vec![1, -1, 5, -2, 3];
+/// let target = 3;
+/// let result = subarray_sum(arr, target);
+/// assert_eq!(result, vec![1, 4]); // Subarray [1, -1, 5, -2] sums to 3.
+///
+/// let arr = vec![1, 2, 3];
+/// let target = 10;
+/// let result = subarray_sum(arr, target);
+/// assert_eq!(result, Vec::<i32>::new()); // No subarray sums to 10.
+/// ```
+///
+/// # Notes
+///
+/// The function uses a prefix sum approach with a `HashMap` to track cumulative sums encountered
+/// during iteration. The key idea is to compute the complement of the current cumulative sum
+/// relative to the target and check whether it exists in the hash map. If found, a valid subarray
+/// exists starting from the next position of the complement to the current position (both inclusive).
+///
+/// The function assumes the input array may contain positive, negative, or zero integers.
+fn subarray_sum(arr: Vec<i32>, target: i32) -> Vec<i32> {
+    let mut prefix_sums: HashMap<i32, i32> = HashMap::new();
+    prefix_sums.insert(0, 0);
+    let mut sum = 0;
+    for i in 0..arr.len() {
+        sum += arr[i];
+        let complement = sum - target;
+        if let Some(prefix_sum_end) = prefix_sums.get(&complement) {
+           return vec![prefix_sum_end.clone(), (i + 1) as i32]
+        }
+        *prefix_sums.entry(sum).or_insert((i + 1) as i32);
+    }
+    Vec::new()
+}
+
+
+/// Calculates the total number of continuous subarrays within a given array whose sums equal a specific target value.
+///
+/// This function uses a prefix sum approach with a hash map to efficiently calculate the number of subarrays that satisfy the condition in O(n) time complexity.
+///
+/// # Arguments
+///
+/// * `arr` - A vector of integers representing the input array.
+/// * `target` - An integer representing the target sum for the subarray.
+///
+/// # Returns
+///
+/// * An integer representing the total number of continuous subarrays within `arr` whose sums equal `target`.
+///
+/// # Example
+///
+/// ```
+/// use std::collections::HashMap;
+///
+/// let arr = vec![1, 1, 1];
+/// let target = 2;
+/// let result = subarray_sum_total(arr, target);
+/// assert_eq!(result, 2); // There are two subarrays: [1, 1] and [1, 1].
+/// ```
+///
+/// # Algorithm
+///
+/// 1. Initialize a hash map (`prefix_sums`) to store prefix sums and their frequencies. Insert an entry for prefix sum 0 with a count of 1.
+/// 2. Use a running sum (`curr_sum`) to calculate the cumulative sum of the array as you iterate through it.
+/// 3. For each element in the array, calculate the complement as `curr_sum - target`.
+/// 4. Check if the complement exists in the hash map (`prefix_sums`). If it does, add its frequency to the result count (`count`).
+/// 5. Update the frequency of the current prefix sum in the hash map.
+/// 6. Return the total count of subarrays that satisfy the condition.
+///
+/// # Note
+///
+/// This implementation requires the `HashMap` from the standard library. Ensure it is imported before calling the function.
+fn subarray_sum_total(arr: Vec<i32>, target: i32) -> i32 {
+    let mut prefix_sums: HashMap<i32, i32> = HashMap::new();
+    prefix_sums.insert(0, 1);
+    let mut curr_sum = 0;
+    let mut count = 0;
+    
+    for val in arr {
+        curr_sum += val;
+        let complement =   curr_sum - target;
+        if let Some(prefix_sum_end) = prefix_sums.get(&complement) {
+            count += prefix_sum_end;
+        }
+        *prefix_sums.entry(curr_sum).or_insert(0) += 1;
+    }
+    count
+}
+
+
+/// Computes the sum of elements in the given range `[left, right]` (inclusive) for an immutable array of integers.
+///
+/// This function utilizes a prefix sum approach to perform efficient range sum queries. 
+/// By precomputing the cumulative sums for the array, it allows for constant-time range sum queries after 
+/// an O(n) preprocessing step. The prefix sums are stored in an auxiliary array (`prefix_sums`) where 
+/// each element represents the sum of all elements in the input array up to that index.
+///
+/// # Arguments
+///
+/// * `nums` - A vector of integers, representing the input array.
+/// * `left` - A `usize` value indicating the starting index of the range (inclusive).
+/// * `right` - A `usize` value indicating the ending index of the range (inclusive).
+///
+/// # Returns
+///
+/// * An `i32` value representing the sum of elements between indices `left` and `right` (inclusive) in the original array.
+///
+/// # Complexity
+///
+/// * Time Complexity:
+///   * Precomputing prefix sums: O(n), where `n` is the length of `nums`.
+///   * Querying the range sum: O(1).
+/// * Space Complexity: O(n) for storing the prefix sums.
+///
+/// # Example
+///
+/// ```
+/// let nums = vec![1, 2, 3, 4, 5];
+/// let left = 1;
+/// let right = 3;
+/// let sum = range_sum_query_immutable(nums, left, right);
+/// assert_eq!(sum, 9); // Sum of nums[1..=3] = 2 + 3 + 4 = 9
+/// ```
+///
+/// # Edge Cases
+///
+/// * If the `left` and `right` indices are out of bounds of the array, this function may panic.
+/// * If `left` == `right`, the function returns the single element at that index.
+/// * If the input vector is empty, the behavior will be undefined or may panic.
+///
+fn range_sum_query_immutable(nums: Vec<i32>, left: usize, right: usize) -> i32 {
+    let mut prefix_sums: Vec<i32> = vec![0; nums.len() + 1];
+    for i in 0..nums.len() {
+        prefix_sums[i + 1] = prefix_sums[i] + nums[i];
+        
+    }
+    prefix_sums[right + 1] - prefix_sums[left]
+}
 #[cfg(test)]
 mod test {
-    use crate::two_pointers::{remove_duplicates, middle_of_linked_list, List, Node, two_sum_sorted, container_with_max_area, subarray_sum_fixed_length};
+    use crate::two_pointers::{remove_duplicates, middle_of_linked_list, List, Node, two_sum_sorted, container_with_max_area, subarray_sum_fixed_length, subarray_sum, subarray_sum_total};
 
-    // Helper function to create a linked list from a vector for easier testing
     fn to_list(vec: Vec<i32>) -> List<i32> {
         let mut current_list = None;
         for &val in vec.iter().rev() {
@@ -284,7 +448,7 @@ mod test {
     }
 
     #[test]
-    fn remove_duplicates_with_duplicats_returns_new_size() {
+    fn remove_duplicates_with_duplicates_returns_new_size() {
         let mut arr: Vec<i32> = vec![1, 1, 1, 2, 2, 3, 3, 3];
 
         let size_after_removed_duplicates = remove_duplicates(&mut arr);
@@ -402,5 +566,35 @@ mod test {
     fn subarray_sum_fixed_length_single_element() {
         let arr = vec![5, 2, 1, 3];
         assert_eq!(subarray_sum_fixed_length(arr, 1), 5);
+    }
+
+    #[test]
+    fn subarray_sum_finds_target() {
+        let arr = vec![1, -20, -3, 30, 5, 4];
+        assert_eq!(subarray_sum(arr, 7), vec![1, 4]);
+    }
+
+    #[test]
+    fn subarray_sum_no_solution() {
+        let arr = vec![1, 2, 3, 4];
+        assert_eq!(subarray_sum(arr, 8), vec![]);
+    }
+
+    #[test]
+    fn subarray_sum_zero_length() {
+        let arr = vec![];
+        assert_eq!(subarray_sum(arr, 5), vec![]);
+    }
+
+    #[test]
+    fn subarray_sum_total_same_elements() {
+        let arr = vec![1, 1, 1];
+        assert_eq!(subarray_sum_total(arr, 2), 2);
+    }
+
+    #[test]
+    fn subarray_sum_total_with_negative() {
+        let arr = vec![10, 5, -5, -20, 10];
+        assert_eq!(subarray_sum_total(arr, -10), 3);
     }
 }
