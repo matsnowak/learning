@@ -60,9 +60,28 @@ fn remove_duplicates(arr: &mut Vec<i32>) -> usize {
 }
 type List<T> = Option<Box<Node<T>>>;
 
+#[derive(PartialEq)]
 struct Node<T> {
     val: T,
     next: List<T>,
+}
+
+#[allow(dead_code)]
+fn has_cycle(head: List<i32>) -> bool {
+    let mut slow = &head;
+    let mut fast = &head;
+    while let Some(curr) = fast {
+        if let Some(next) = &curr.next {
+            fast = &next.next;
+            slow = &slow.as_ref().unwrap().next;
+        } else {
+            break;
+        }
+        if slow == fast {
+            return true;
+        }
+    }
+    false
 }
 
 /// Finds and returns the value of the middle node in a singly linked list.
