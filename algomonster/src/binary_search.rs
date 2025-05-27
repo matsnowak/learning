@@ -189,7 +189,10 @@ mod tests {
 
     #[test]
     fn binary_search_first_matching_should_find() {
-        let given_input = vec![false, false, false, true, true, true, true, true, true,true, true, true, true, true, true, true, true, true ];
+        let given_input = vec![
+            false, false, false, true, true, true, true, true, true, true, true, true, true, true,
+            true, true, true, true,
+        ];
         let result = binary_search_first_matching(&given_input, |x| *x);
 
         assert_eq!(result.unwrap(), 3);

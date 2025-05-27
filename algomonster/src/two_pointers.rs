@@ -4,16 +4,16 @@ use std::collections::HashMap;
 /// and returns the number of unique elements.
 ///
 /// This function modifies the given vector such that the first
-/// portion contains all unique elements in sorted order without duplicates, 
+/// portion contains all unique elements in sorted order without duplicates,
 /// and the remaining portion of the vector is left undefined.
 ///
 /// # Parameters
-/// - `arr`: A mutable reference to a vector of i32 values. 
-///   The vector must be sorted before calling this function, 
+/// - `arr`: A mutable reference to a vector of i32 values.
+///   The vector must be sorted before calling this function,
 ///   as the function assumes the sorted order of elements for removing duplicates.
 ///
 /// # Returns
-/// - The number of unique elements in the vector after removing duplicates. 
+/// - The number of unique elements in the vector after removing duplicates.
 ///
 /// # Behavior
 /// - If the input vector `arr` is empty, the function immediately returns 0.
@@ -40,8 +40,9 @@ use std::collections::HashMap;
 /// - A `debug_assert!` ensures that the `write_index` never exceeds the current iteration index `i`.
 ///
 /// # Notes
-/// Ensure that the input vector is sorted before calling this function. 
+/// Ensure that the input vector is sorted before calling this function.
 /// If the input vector is not sorted, the behavior of the function is undefined.
+#[allow(dead_code)]
 fn remove_duplicates(arr: &mut Vec<i32>) -> usize {
     if arr.is_empty() {
         return 0;
@@ -64,7 +65,6 @@ struct Node<T> {
     next: List<T>,
 }
 
-
 /// Finds and returns the value of the middle node in a singly linked list.
 ///
 /// This function uses the two-pointer technique with `slow` and `fast` pointers to determine
@@ -76,7 +76,7 @@ struct Node<T> {
 /// * `head` - The head of the singly linked list is represented as `List<i32>`.
 ///
 /// # Returns
-/// * `i32` - The value of the middle node in the singly linked list. If the list has an even 
+/// * `i32` - The value of the middle node in the singly linked list. If the list has an even
 ///   number of nodes, the function returns the value of the second middle node.
 ///
 /// # Example
@@ -97,6 +97,8 @@ struct Node<T> {
 /// # Complexity
 /// * Time Complexity: O(n), where n is the number of nodes in the linked list.
 /// * Space Complexity: O(1), as no additional data structures are used.
+
+#[allow(dead_code)]
 fn middle_of_linked_list(head: List<i32>) -> i32 {
     let mut slow = &head;
     let mut fast = &head;
@@ -116,8 +118,8 @@ fn middle_of_linked_list(head: List<i32>) -> i32 {
 /// Finds the indices of two numbers in a sorted vector that add up to a given target.
 ///
 /// This function assumes the input vector `arr` is sorted in ascending order.
-/// It uses a two-pointer approach to find the indices of the two numbers that 
-/// add up to the specified target. If such a pair is found, their indices are 
+/// It uses a two-pointer approach to find the indices of the two numbers that
+/// add up to the specified target. If such a pair is found, their indices are
 /// returned in a vector. Otherwise, an empty vector is returned.
 ///
 /// # Arguments
@@ -153,16 +155,17 @@ fn middle_of_linked_list(head: List<i32>) -> i32 {
 ///
 /// # Complexity
 ///
-/// - Time Complexity: O(n), where `n` is the length of the input vector. This is 
-///   because each iteration of the while loop processes one element from either 
+/// - Time Complexity: O(n), where `n` is the length of the input vector. This is
+///   because each iteration of the while loop processes one element from either
 ///   end of the vector.
-/// - Space Complexity: O(1), as no additional space is used apart from the result 
+/// - Space Complexity: O(1), as no additional space is used apart from the result
 ///   vector.
+#[allow(dead_code)]
 fn two_sum_sorted(arr: Vec<i32>, target: i32) -> Vec<i32> {
     let mut left = 0;
     let mut right = arr.len() - 1;
     let mut result = Vec::new();
-    
+
     while left < right {
         let sum = arr[left] + arr[right];
         if sum == target {
@@ -214,23 +217,24 @@ fn two_sum_sorted(arr: Vec<i32>, target: i32) -> Vec<i32> {
 /// let result = container_with_max_area(heights);
 /// assert_eq!(result, 49); // The maximum area is formed between heights at indices 1 and 8.
 /// ```
+#[allow(dead_code)]
 fn container_with_max_area(height: Vec<i32>) -> i32 {
     if height.is_empty() {
         return 0;
     }
     let mut max_area = 0;
     let mut left = 0;
-    let mut right = height.len() - 1 ;
+    let mut right = height.len() - 1;
     while left < right {
         let area = (right - left) as i32 * std::cmp::min(height[left], height[right]);
         max_area = std::cmp::max(max_area, area);
         if height[left] < height[right] {
             left += 1;
         } else {
-            right -= 1;       
+            right -= 1;
         }
     }
-    max_area   
+    max_area
 }
 /// Finds the maximum sum of a fixed-length subarray within a given array.
 ///
@@ -255,6 +259,8 @@ fn container_with_max_area(height: Vec<i32>) -> i32 {
 /// # Complexity
 /// * Time Complexity: O(n), where n is the length of the input array
 /// * Space Complexity: O(1)
+
+#[allow(dead_code)]
 fn subarray_sum_fixed_length(arr: Vec<i32>, k: usize) -> i32 {
     let mut window_sum = 0;
     for i in 0..k {
@@ -269,7 +275,6 @@ fn subarray_sum_fixed_length(arr: Vec<i32>, k: usize) -> i32 {
     }
     largest
 }
-
 
 /// Finds a contiguous subarray within a given array `arr` that sums up to a specified target value
 /// and returns the 1-based starting and ending indices of that subarray. If no such subarray exists,
@@ -314,6 +319,8 @@ fn subarray_sum_fixed_length(arr: Vec<i32>, k: usize) -> i32 {
 /// exists starting from the next position of the complement to the current position (both inclusive).
 ///
 /// The function assumes the input array may contain positive, negative, or zero integers.
+
+#[allow(dead_code)]
 fn subarray_sum(arr: Vec<i32>, target: i32) -> Vec<i32> {
     let mut prefix_sums: HashMap<i32, i32> = HashMap::new();
     prefix_sums.insert(0, 0);
@@ -322,13 +329,12 @@ fn subarray_sum(arr: Vec<i32>, target: i32) -> Vec<i32> {
         sum += arr[i];
         let complement = sum - target;
         if let Some(prefix_sum_end) = prefix_sums.get(&complement) {
-           return vec![prefix_sum_end.clone(), (i + 1) as i32]
+            return vec![prefix_sum_end.clone(), (i + 1) as i32];
         }
         let _ = *prefix_sums.entry(sum).or_insert((i + 1) as i32);
     }
     Vec::new()
 }
-
 
 /// Calculates the total number of continuous subarrays within a given array whose sums equal a specific target value.
 ///
@@ -366,15 +372,17 @@ fn subarray_sum(arr: Vec<i32>, target: i32) -> Vec<i32> {
 /// # Note
 ///
 /// This implementation requires the `HashMap` from the standard library. Ensure it is imported before calling the function.
+
+#[allow(dead_code)]
 fn subarray_sum_total(arr: Vec<i32>, target: i32) -> i32 {
     let mut prefix_sums: HashMap<i32, i32> = HashMap::new();
     prefix_sums.insert(0, 1);
     let mut curr_sum = 0;
     let mut count = 0;
-    
+
     for val in arr {
         curr_sum += val;
-        let complement =   curr_sum - target;
+        let complement = curr_sum - target;
         if let Some(prefix_sum_end) = prefix_sums.get(&complement) {
             count += prefix_sum_end;
         }
@@ -383,12 +391,11 @@ fn subarray_sum_total(arr: Vec<i32>, target: i32) -> i32 {
     count
 }
 
-
 /// Computes the sum of elements in the given range `[left, right]` (inclusive) for an immutable array of integers.
 ///
-/// This function utilizes a prefix sum approach to perform efficient range sum queries. 
-/// By precomputing the cumulative sums for the array, it allows for constant-time range sum queries after 
-/// an O(n) preprocessing step. The prefix sums are stored in an auxiliary array (`prefix_sums`) where 
+/// This function uses a prefix sum approach to perform efficient range sum queries.
+/// By precomputing the cumulative sums for the array, it allows for constant-time range sum queries after
+/// an O(n) preprocessing step. The prefix sums are stored in an auxiliary array (`prefix_sums`) where
 /// each element represents the sum of all elements in the input array up to that index.
 ///
 /// # Arguments
@@ -424,34 +431,96 @@ fn subarray_sum_total(arr: Vec<i32>, target: i32) -> i32 {
 /// * If `left` == `right`, the function returns the single element at that index.
 /// * If the input vector is empty, the behavior will be undefined or may panic.
 ///
+
+#[allow(dead_code)]
 fn range_sum_query_immutable(nums: Vec<i32>, left: usize, right: usize) -> i32 {
     let mut prefix_sums: Vec<i32> = vec![0; nums.len() + 1];
     for i in 0..nums.len() {
         prefix_sums[i + 1] = prefix_sums[i] + nums[i];
-        
     }
     prefix_sums[right + 1] - prefix_sums[left]
 }
 
-fn product_of_array_except_self(nums: Vec<i32>) -> Vec<i32> {
-    let mut result =  vec![1; nums.len()];
-    let mut left = 1;
-    for i in 0..nums.len() {
-        result[i] = left; 
-        left *= nums[i];
+/// Computes the product of all elements in the array except the current index for each element.
+///
+/// This function takes a slice of integers as input and returns a vector where each
+/// element at index `i` is the product of all the elements in the input array except
+/// the one at index `i`. It achieves this without using division by precomputing the
+/// prefix and suffix products for each element.
+///
+/// # Arguments
+/// * `nums` - A slice of integers for which the product of elements excluding the current one is computed.
+///
+/// # Returns
+/// A vector of integers where each element at index `i` is the product of all the elements
+/// from the given array except the one at index `i`.
+///
+/// # Edge Cases
+/// * If the input array is empty (`nums` is empty), the function will return an
+///   empty vector.
+/// * The function assumes all elements in `nums` are valid integers and doesn't
+///   handle potential overflow cases for very large products.
+///
+/// # Time Complexity
+/// * O(n): The function iterates through the array twice, first to compute the prefix
+///   products and then the suffix products, resulting in linear time complexity.
+///
+/// # Space Complexity
+/// * O(n): The function uses an additional vector of the same size as the input
+///   array to store results.
+///
+/// # Examples
+///
+/// ```
+/// let nums = vec![1, 2, 3, 4];
+/// let result = product_of_array_except_self(&nums);
+/// assert_eq!(result, vec![24, 12, 8, 6]);
+/// ```
+///
+/// ```
+/// let nums = vec![0, 1, 2, 3];
+/// let result = product_of_array_except_self(&nums);
+/// assert_eq!(result, vec![6, 0, 0, 0]);
+/// ```
+///
+/// ```
+/// let nums: Vec<i32> = vec![];
+/// let result = product_of_array_except_self(&nums);
+/// assert_eq!(result, vec![]);
+/// ```
+
+#[allow(dead_code)]
+fn product_of_array_except_self(nums: &[i32]) -> Vec<i32> {
+    let n = nums.len();
+
+    if n == 0 {
+        return Vec::new();
     }
-    let mut right = 1;
-    for i in (0..nums.len()).rev() {
-        result[i] *= right;
-        right *= nums[i];
+
+    let mut result = vec![1; n];
+
+    let mut prefix_product = 1;
+    for i in 0..n {
+        result[i] = prefix_product;
+        prefix_product *= nums[i];
     }
-    
+
+    let mut suffix_product = 1;
+    for i in (0..n).rev() {
+        result[i] *= suffix_product;
+        suffix_product *= nums[i];
+    }
+
     result
 }
 
 #[cfg(test)]
 mod test {
-    use crate::two_pointers::{remove_duplicates, middle_of_linked_list, List, Node, two_sum_sorted, container_with_max_area, subarray_sum_fixed_length, subarray_sum, subarray_sum_total, range_sum_query_immutable, product_of_array_except_self};
+    use crate::two_pointers::{
+        container_with_max_area, middle_of_linked_list, product_of_array_except_self,
+        range_sum_query_immutable, remove_duplicates, subarray_sum, subarray_sum_fixed_length,
+        subarray_sum_total, two_sum_sorted, List, Node,
+    };
 
     fn to_list(vec: Vec<i32>) -> List<i32> {
         let mut current_list = None;
@@ -618,25 +687,28 @@ mod test {
     #[test]
     fn product_of_array_except_self_typical_case() {
         let nums = vec![1, 2, 3, 4];
-        assert_eq!(product_of_array_except_self(nums), vec![24, 12, 8, 6]);
+        assert_eq!(product_of_array_except_self(&nums), vec![24, 12, 8, 6]);
     }
 
     #[test]
     fn product_of_array_except_self_with_zero() {
         let nums = vec![0, 1, 2, 3];
-        assert_eq!(product_of_array_except_self(nums), vec![6, 0, 0, 0]);
+        assert_eq!(product_of_array_except_self(&nums), vec![6, 0, 0, 0]);
     }
 
     #[test]
     fn product_of_array_except_self_two_zeros() {
         let nums = vec![0, 1, 0, 3];
-        assert_eq!(product_of_array_except_self(nums), vec![0, 0, 0, 0]);
+        assert_eq!(
+            product_of_array_except_self(nums.as_ref()),
+            vec![0, 0, 0, 0]
+        );
     }
 
     #[test]
     fn product_of_array_except_self_single_element() {
         let nums = vec![5];
-        assert_eq!(product_of_array_except_self(nums), vec![1]);
+        assert_eq!(product_of_array_except_self(nums.as_ref()), vec![1]);
     }
 
     #[test]
