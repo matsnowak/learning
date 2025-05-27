@@ -324,7 +324,7 @@ fn subarray_sum(arr: Vec<i32>, target: i32) -> Vec<i32> {
         if let Some(prefix_sum_end) = prefix_sums.get(&complement) {
            return vec![prefix_sum_end.clone(), (i + 1) as i32]
         }
-        *prefix_sums.entry(sum).or_insert((i + 1) as i32);
+        let _ = *prefix_sums.entry(sum).or_insert((i + 1) as i32);
     }
     Vec::new()
 }
@@ -432,9 +432,26 @@ fn range_sum_query_immutable(nums: Vec<i32>, left: usize, right: usize) -> i32 {
     }
     prefix_sums[right + 1] - prefix_sums[left]
 }
+
+fn product_of_array_except_self(nums: Vec<i32>) -> Vec<i32> {
+    let mut result =  vec![1; nums.len()];
+    let mut left = 1;
+    for i in 0..nums.len() {
+        result[i] = left; 
+        left *= nums[i];
+    }
+    let mut right = 1;
+    for i in (0..nums.len()).rev() {
+        result[i] *= right;
+        right *= nums[i];
+    }
+    
+    result
+}
+
 #[cfg(test)]
 mod test {
-    use crate::two_pointers::{remove_duplicates, middle_of_linked_list, List, Node, two_sum_sorted, container_with_max_area, subarray_sum_fixed_length, subarray_sum, subarray_sum_total};
+    use crate::two_pointers::{remove_duplicates, middle_of_linked_list, List, Node, two_sum_sorted, container_with_max_area, subarray_sum_fixed_length, subarray_sum, subarray_sum_total, range_sum_query_immutable, product_of_array_except_self};
 
     fn to_list(vec: Vec<i32>) -> List<i32> {
         let mut current_list = None;
@@ -596,5 +613,54 @@ mod test {
     fn subarray_sum_total_with_negative() {
         let arr = vec![10, 5, -5, -20, 10];
         assert_eq!(subarray_sum_total(arr, -10), 3);
+    }
+
+    #[test]
+    fn product_of_array_except_self_typical_case() {
+        let nums = vec![1, 2, 3, 4];
+        assert_eq!(product_of_array_except_self(nums), vec![24, 12, 8, 6]);
+    }
+
+    #[test]
+    fn product_of_array_except_self_with_zero() {
+        let nums = vec![0, 1, 2, 3];
+        assert_eq!(product_of_array_except_self(nums), vec![6, 0, 0, 0]);
+    }
+
+    #[test]
+    fn product_of_array_except_self_two_zeros() {
+        let nums = vec![0, 1, 0, 3];
+        assert_eq!(product_of_array_except_self(nums), vec![0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn product_of_array_except_self_single_element() {
+        let nums = vec![5];
+        assert_eq!(product_of_array_except_self(nums), vec![1]);
+    }
+
+    #[test]
+    fn range_sum_query_immutable_typical_case() {
+        let nums = vec![1, 2, 3, 4, 5];
+        assert_eq!(range_sum_query_immutable(nums, 1, 3), 9);
+    }
+
+    #[test]
+    fn range_sum_query_immutable_single_element() {
+        let nums = vec![5];
+        assert_eq!(range_sum_query_immutable(nums, 0, 0), 5);
+    }
+
+    #[test]
+    fn range_sum_query_immutable_entire_array() {
+        let nums = vec![1, 2, 3, 4, 5];
+        assert_eq!(range_sum_query_immutable(nums, 0, 4), 15);
+    }
+
+    #[test]
+    #[should_panic]
+    fn range_sum_query_immutable_out_of_bounds() {
+        let nums = vec![1, 2, 3];
+        range_sum_query_immutable(nums, 0, 3);
     }
 }
