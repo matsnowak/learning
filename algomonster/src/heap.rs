@@ -125,6 +125,79 @@ fn k_closest_points(points: Vec<Vec<i32>>, k: i32) -> Vec<Vec<i32>> {
 
 }
 
+/// Merges `k` sorted lists into a single sorted list.
+///
+/// This function takes a `Vec` of sorted integer lists and combines
+/// them into a single sorted list. It uses a min-heap approach
+/// to efficiently merge the lists.
+///
+/// # Arguments
+///
+/// * `lists` - A vector of vectors, where each inner vector
+/// represents a sorted list of integers.
+///
+/// # Returns
+///
+/// A single vector containing all elements from the input lists in
+/// sorted order.
+///
+/// # Examples
+///
+/// ```
+/// use std::collections::BinaryHeap;
+/// use std::cmp::Reverse;
+///
+/// let lists = vec![
+///     vec![1, 4, 5],
+///     vec![1, 3, 4],
+///     vec![2, 6],
+/// ];
+/// let merged = merge_k_sorted_lists(lists);
+/// assert_eq!(merged, vec![1, 1, 2, 3, 4, 4, 5, 6]);
+/// ```
+///
+/// # Implementation Notes
+///
+/// 1. A `BinaryHeap` is used to maintain the smallest elements
+///    from each list, with the heap storing tuples in the form of
+///    `(value, list_index, element_index)`.
+/// 2. The heap is initialized with the first element from
+///    each non-empty list.
+/// 3. The heap's top element is repeatedly popped, its value is
+///    added to the result, and the next element from the same
+///    list (if available) is pushed into the heap.
+/// 4. The function continues until the heap is empty.
+///
+/// # Complexity
+///
+/// - **Time Complexity**: `O(n log k)` where `n` is the total number
+///   of elements across all lists, and `k` is the number of input lists.
+/// - **Space Complexity**: `O(k)` due to the heap storing up to `k` elements.
+#[allow(dead_code)]
+pub fn merge_k_sorted_lists(lists: Vec<Vec<i32>>) -> Vec<i32> {
+    // A tuple of (value, list_index, element_index)
+    let mut heap = BinaryHeap::new();
+    let mut result = Vec::new();
+
+    // Initialize heap with the first element from each list
+    for (i, lst) in lists.iter().enumerate() {
+        if !lst.is_empty() {
+            heap.push(Reverse((lst[0], i, 0)));
+        }
+    }
+
+    while let Some(Reverse((val, list_idx, elem_idx))) = heap.pop() {
+        result.push(val);
+        let next_idx = elem_idx + 1;
+        
+        // current list is not empty
+        if let Some(&next_val) = lists[list_idx].get(next_idx) {
+            heap.push(Reverse((next_val, list_idx, next_idx)));
+        }
+    }
+
+    result
+}
 
 #[cfg(test)]
 mod tests {
@@ -164,4 +237,25 @@ mod tests {
         assert_eq!(result, vec![vec![-2, 2], vec![0, 1]]);
     }
 
+    #[test]
+    fn test_merge_k_sorted_lists_normal() {
+        let lists = vec![
+            vec![1, 4, 5],
+            vec![1, 3, 4],
+            vec![2, 6],
+        ];
+        assert_eq!(merge_k_sorted_lists(lists), vec![1, 1, 2, 3, 4, 4, 5, 6]);
+    }
+
+    #[test]
+    fn test_merge_k_sorted_lists_empty() {
+        let lists: Vec<Vec<i32>> = vec![];
+        assert_eq!(merge_k_sorted_lists(lists), vec![]);
+    }
+
+    #[test]
+    fn test_merge_k_sorted_lists_single() {
+        let lists = vec![vec![1, 2, 3]];
+        assert_eq!(merge_k_sorted_lists(lists), vec![1, 2, 3]);
+    }
 }
